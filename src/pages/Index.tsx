@@ -1,19 +1,58 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React, { useState } from 'react';
+import { LoginForm } from '@/components/LoginForm';
+import { AppLayout } from '@/pages/AppLayout';
+import { supabase } from '@/lib/supabase';
 
-import { MadeWithDyad } from "@/components/made-with-dyad";
+export default function Index() {
+  const [user, setUser] = useState<{ id: string; email: string } | null>(null);
+  const [loading, setLoading] = useState(false);
 
-const Index = () => {
+  const handleLogin = async (email: string, password: string) => {
+    setLoading(true);
+    
+    try {
+      // Try Supabase authentication
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (error) throw error;
+      
+      if (data.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email || ''
+        });
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      // Demo login for development
+      if (email && password) {
+        setUser({
+          id: 'demo-' + Date.now(),
+          email
+        });
+      } else {
+        alert('Credenciais inválidas');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    supabase.auth.signOut();
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">
-          Start building your amazing project here!
-        </p>
-      </div>
-      <MadeWithDyad />
+    <div className="min-h-screen">
+      {user ? (
+        <AppLayout user={user} onLogout={handleLogout} />
+      ) : (
+        <LoginForm onLogin={handleLogin} loading={loading} />
+      )}
     </div>
   );
-};
-
-export default Index;
+}
