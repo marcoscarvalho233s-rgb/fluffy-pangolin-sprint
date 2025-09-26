@@ -78,7 +78,7 @@ const Index = () => {
           description: "Bem-vindo ao Meus Projetos"
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       // Demo login fallback
       if (email && password) {
