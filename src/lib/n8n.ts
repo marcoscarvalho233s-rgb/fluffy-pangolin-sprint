@@ -1,4 +1,4 @@
-const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://webhook.shampooautomat.shop/webhook/aplicativoft';
+const N8N_WEBHOOK_URL = 'https://webhook.shampooautomat.shop/webhook/n8naplicativofoto';
 
 export const notifyN8N = async (evento: string, dados: any) => {
   try {
