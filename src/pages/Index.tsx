@@ -10,7 +10,6 @@ import { ShareModal } from "@/components/ShareModal";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { notifyN8N } from "@/lib/n8n";
-import JSZip from 'jszip';
 
 const Index = () => {
   const [user, setUser] = useState<any>(null);
@@ -295,78 +294,9 @@ const Index = () => {
     
     try {
       toast({
-        title: "Gerando download...",
-        description: "Preparando o arquivo ZIP com todas as fotos"
-      });
-      
-      const zip = new JSZip();
-      const projectFolder = zip.folder(selectedProject.nome);
-      
-      // Create README
-      const readmeContent = `PROJETO: ${selectedProject.nome}
-DESCRIÇÃO: ${selectedProject.descricao || 'Sem descrição'}
-DATA DE CRIAÇÃO: ${new Date(selectedProject.data_criacao).toLocaleString('pt-BR')}
-TOTAL DE FOTOS: ${photos.length}
-PROPRIETÁRIO: ${selectedProject.proprietario || user.email}
-DATA DO DOWNLOAD: ${new Date().toLocaleString('pt-BR')}
-COMPARTILHADO: ${selectedProject.compartilhado ? 'Sim' : 'Não'}
-
-LISTA DE FOTOS:
-${photos.map((foto, index) => 
-  `${index + 1}. ${foto.nome_arquivo} (${foto.tamanho_kb}KB) - ${new Date(foto.data_upload).toLocaleString('pt-BR')}`
-).join('\n')}`;
-      
-      projectFolder?.file('README.txt', readmeContent);
-      
-      // Add photos
-      for (let i = 0; i < photos.length; i++) {
-        const photo = photos[i];
-        
-        try {
-          const response = await fetch(photo.url);
-          const blob = await response.blob();
-          
-          let fileName = photo.nome_arquivo;
-          if (!fileName.includes('.')) {
-            const extension = photo.tipo_mime ? photo.tipo_mime.split('/')[1] : 'jpg';
-            fileName += `.${extension}`;
-          }
-          
-          projectFolder?.file(fileName, blob);
-        } catch (error) {
-          console.error(`Erro ao baixar foto ${photo.nome_arquivo}:`, error);
-        }
-      }
-      
-      // Generate ZIP
-      const zipBlob = await zip.generateAsync({
-        type: 'blob',
-        compression: 'DEFLATE',
-        compressionOptions: { level: 6 }
-      });
-      
-      // Download
-      const url = URL.createObjectURL(zipBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${selectedProject.nome}_${new Date().toISOString().split('T')[0]}.zip`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-      // Notify n8n
-      await notifyN8N('projeto_download', {
-        projeto_id: selectedProject.id,
-        projeto_nome: selectedProject.nome,
-        usuario: user.email,
-        total_fotos: photos.length,
-        formato: 'zip'
-      });
-      
-      toast({
-        title: "Download concluído!",
-        description: "O arquivo ZIP foi baixado com sucesso"
+        title: "Download não disponível",
+        description: "O download de ZIP não está configurado neste exemplo",
+        variant: "destructive"
       });
     } catch (error) {
       console.error('Download error:', error);
