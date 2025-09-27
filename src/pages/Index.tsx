@@ -10,6 +10,7 @@ import { ShareModal } from "@/components/ShareModal";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { notifyN8N } from "@/lib/n8n";
+import { motion } from "framer-motion";
 
 const Index = () => {
   const [user, setUser] = useState<any>(null);
@@ -379,6 +380,31 @@ const Index = () => {
     }
   };
 
+  const handleDeleteProject = async (project: any) => {
+    try {
+      // Remove project
+      setProjects(prev => prev.filter(p => p.id !== project.id));
+      
+      // If the deleted project was selected, go back to projects list
+      if (selectedProject && selectedProject.id === project.id) {
+        setSelectedProject(null);
+        setPhotos([]);
+      }
+      
+      toast({
+        title: "Projeto excluído",
+        description: `O projeto "${project.nome}" foi removido`
+      });
+    } catch (error) {
+      console.error('Delete project error:', error);
+      toast({
+        title: "Erro ao excluir projeto",
+        description: "Não foi possível remover o projeto",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (!user) {
     return <LoginForm onLogin={handleLogin} loading={loading} />;
   }
@@ -390,12 +416,18 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">📷</span>
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-2 rounded-lg">
+                <span className="text-xl text-white">📷</span>
+              </div>
               <h1 className="text-xl font-bold text-gray-900">Meus Projetos</h1>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">Olá, {user.email}</span>
-              <Button variant="outline" onClick={handleLogout}>
+              <span className="text-sm text-gray-600 hidden md:inline">Olá, {user.email}</span>
+              <Button 
+                variant="outline" 
+                onClick={handleLogout}
+                className="border-gray-300 hover:bg-gray-100 text-gray-700"
+              >
                 Sair
               </Button>
             </div>
@@ -417,58 +449,106 @@ const Index = () => {
             />
             
             {photos.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <motion.div 
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
                 {photos.map(photo => (
-                  <PhotoCard 
-                    key={photo.id} 
-                    photo={photo} 
-                    onDelete={handleDeletePhoto} 
-                  />
+                  <motion.div
+                    key={photo.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <PhotoCard 
+                      photo={photo} 
+                      onDelete={handleDeletePhoto} 
+                    />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             ) : (
-              <div className="text-center py-12">
-                <div className="text-5xl mb-4">📷</div>
-                <h3 className="text-xl font-semibold mb-2">Nenhuma foto ainda</h3>
+              <motion.div 
+                className="text-center py-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="text-5xl mb-4 text-gray-300">📷</div>
+                <h3 className="text-xl font-semibold mb-2 text-gray-700">Nenhuma foto ainda</h3>
                 <p className="text-gray-500 mb-6">
                   Use a câmera para tirar fotos ou adicione da galeria
                 </p>
-              </div>
+              </motion.div>
             )}
           </>
         ) : (
           <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <motion.div 
+              className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Meus Projetos</h2>
                 <p className="text-gray-500">Organize e compartilhe suas fotos por projetos</p>
               </div>
-              <Button onClick={() => setShowNewProjectModal(true)}>
+              <Button 
+                onClick={() => setShowNewProjectModal(true)}
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white"
+              >
                 ➕ Novo Projeto
               </Button>
-            </div>
+            </motion.div>
             
             {projects.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, staggerChildren: 0.1 }}
+              >
                 {projects.map(project => (
-                  <ProjectCard 
-                    key={project.id} 
-                    project={project} 
-                    onClick={() => handleProjectSelect(project)} 
-                  />
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ProjectCard 
+                      project={project} 
+                      onClick={() => handleProjectSelect(project)} 
+                      onShare={(proj) => {
+                        setSelectedProject(proj);
+                        setShowShareModal(true);
+                      }}
+                      onDelete={handleDeleteProject}
+                    />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             ) : (
-              <div className="text-center py-12">
-                <div className="text-5xl mb-4">📁</div>
-                <h3 className="text-xl font-semibold mb-2">Nenhum projeto encontrado</h3>
+              <motion.div 
+                className="text-center py-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="text-5xl mb-4 text-gray-300">📁</div>
+                <h3 className="text-xl font-semibold mb-2 text-gray-700">Nenhum projeto encontrado</h3>
                 <p className="text-gray-500 mb-6">
                   Crie seu primeiro projeto para começar a organizar suas fotos
                 </p>
-                <Button onClick={() => setShowNewProjectModal(true)}>
+                <Button 
+                  onClick={() => setShowNewProjectModal(true)}
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white"
+                >
                   Criar Projeto
                 </Button>
-              </div>
+              </motion.div>
             )}
           </>
         )}
