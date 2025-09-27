@@ -3,14 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera } from 'lucide-react';
+import { Camera, Chrome } from 'lucide-react';
 
 interface LoginFormProps {
   onLogin: (email: string, password: string) => void;
+  onGoogleLogin: () => void;
   loading: boolean;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loading }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoogleLogin, loading }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -58,9 +59,26 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loading }) => {
               />
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col space-y-4">
             <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white" type="submit" disabled={loading}>
               {loading ? "Entrando..." : "Entrar"}
+            </Button>
+            <div className="relative w-full">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">Ou continue com</span>
+              </div>
+            </div>
+            <Button 
+              type="button" 
+              onClick={onGoogleLogin}
+              className="w-full bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center justify-center"
+              disabled={loading}
+            >
+              <Chrome className="h-5 w-5 mr-2" />
+              Entrar com Google
             </Button>
           </CardFooter>
         </form>

@@ -11,6 +11,15 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { notifyN8N } from "@/lib/n8n";
 import { motion } from "framer-motion";
+import { 
+  Camera as CameraIcon, 
+  Image, 
+  Users, 
+  Calendar,
+  TrendingUp,
+  FolderOpen
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Index = () => {
   const [user, setUser] = useState<any>(null);
@@ -96,6 +105,33 @@ const Index = () => {
         });
       }
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    
+    try {
+      // Try Supabase Google authentication
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      
+      if (error) throw error;
+      
+      // The OAuth flow will redirect the user
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      // Demo login fallback
+      setUser({ id: 'demo-' + Date.now(), email: 'demo@gmail.com' });
+      toast({
+        title: "Modo demonstração",
+        description: "Você está usando o aplicativo em modo de demonstração"
+      });
       setLoading(false);
     }
   };
@@ -405,8 +441,15 @@ const Index = () => {
     }
   };
 
+  // Dashboard stats
+  const totalPhotos = projects.reduce((sum, project) => sum + (project.fotos_count || 0), 0);
+  const sharedProjects = projects.filter(project => project.compartilhado).length;
+  const recentProjects = [...projects].sort((a, b) => 
+    new Date(b.data_criacao).getTime() - new Date(a.data_criacao).getTime()
+  ).slice(0, 3);
+
   if (!user) {
-    return <LoginForm onLogin={handleLogin} loading={loading} />;
+    return <LoginForm onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} loading={loading} />;
   }
 
   return (
@@ -486,11 +529,64 @@ const Index = () => {
           </>
         ) : (
           <>
+            {/* Dashboard Stats */}
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total de Projetos</CardTitle>
+                  <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{projects.length}</div>
+                  <p className="text-xs text-muted-foreground">projetos criados</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total de Fotos</CardTitle>
+                  <CameraIcon className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{totalPhotos}</div>
+                  <p className="text-xs text-muted-foreground">fotos armazenadas</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Projetos Compartilhados</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{sharedProjects}</div>
+                  <p className="text-xs text-muted-foreground">projetos compartilhados</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Projetos Recentes</CardTitle>
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{recentProjects.length}</div>
+                  <p className="text-xs text-muted-foreground">criados recentemente</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+            
+            {/* Quick Actions */}
             <motion.div 
               className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
               <div>
                 <h2 className="text-2xl font-semibold text-gray-800">Meus Projetos</h2>
@@ -504,21 +600,29 @@ const Index = () => {
               </Button>
             </motion.div>
             
-            {projects.length > 0 ? (
-              <motion.div 
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, staggerChildren: 0.1 }}
-              >
-                {projects.map(project => (
-                  <motion.div
-                    key={project.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
+            {/* Recent Projects */}
+            <motion.div 
+              className="mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-800">Projetos Recentes</h3>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => {}}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  Ver todos
+                </Button>
+              </div>
+              
+              {recentProjects.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {recentProjects.map(project => (
                     <ProjectCard 
+                      key={project.id}
                       project={project} 
                       onClick={() => handleProjectSelect(project)} 
                       onShare={(proj) => {
@@ -527,29 +631,62 @@ const Index = () => {
                       }}
                       onDelete={handleDeleteProject}
                     />
-                  </motion.div>
-                ))}
-              </motion.div>
-            ) : (
-              <motion.div 
-                className="text-center py-12"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="text-5xl mb-4 text-gray-300">📁</div>
-                <h3 className="text-xl font-medium mb-2 text-gray-700">Nenhum projeto encontrado</h3>
-                <p className="text-gray-500 mb-6">
-                  Crie seu primeiro projeto para começar a organizar suas fotos
-                </p>
-                <Button 
-                  onClick={() => setShowNewProjectModal(true)}
-                  className="bg-gray-800 hover:bg-gray-700 text-white"
-                >
-                  Criar Projeto
-                </Button>
-              </motion.div>
-            )}
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
+                  <FolderOpen className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                  <h4 className="text-lg font-medium text-gray-700 mb-2">Nenhum projeto recente</h4>
+                  <p className="text-gray-500 mb-4">Crie seu primeiro projeto para começar</p>
+                  <Button 
+                    onClick={() => setShowNewProjectModal(true)}
+                    className="bg-gray-800 hover:bg-gray-700 text-white"
+                  >
+                    Criar Projeto
+                  </Button>
+                </div>
+              )}
+            </motion.div>
+            
+            {/* All Projects */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <h3 className="text-lg font-medium text-gray-800 mb-4">Todos os Projetos</h3>
+              
+              {projects.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {projects.map(project => (
+                    <ProjectCard 
+                      key={project.id}
+                      project={project} 
+                      onClick={() => handleProjectSelect(project)} 
+                      onShare={(proj) => {
+                        setSelectedProject(proj);
+                        setShowShareModal(true);
+                      }}
+                      onDelete={handleDeleteProject}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-5xl mb-4 text-gray-300">📁</div>
+                  <h3 className="text-xl font-medium mb-2 text-gray-700">Nenhum projeto encontrado</h3>
+                  <p className="text-gray-500 mb-6">
+                    Crie seu primeiro projeto para começar a organizar suas fotos
+                  </p>
+                  <Button 
+                    onClick={() => setShowNewProjectModal(true)}
+                    className="bg-gray-800 hover:bg-gray-700 text-white"
+                  >
+                    Criar Projeto
+                  </Button>
+                </div>
+              )}
+            </motion.div>
           </>
         )}
       </main>
