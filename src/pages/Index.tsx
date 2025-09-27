@@ -7,6 +7,7 @@ import { CameraView } from "@/components/CameraView";
 import { ProjectHeader } from "@/components/ProjectHeader";
 import { NewProjectModal } from "@/components/NewProjectModal";
 import { ShareModal } from "@/components/ShareModal";
+import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { notifyN8N } from "@/lib/n8n";
@@ -20,6 +21,7 @@ import {
   FolderOpen
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const [user, setUser] = useState<any>(null);
@@ -31,6 +33,7 @@ const Index = () => {
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Load demo data
   useEffect(() => {
@@ -453,193 +456,177 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <div className="bg-gray-800 p-2 rounded-lg">
-                <span className="text-xl text-white">📷</span>
-              </div>
-              <h1 className="text-xl font-semibold text-gray-800">Meus Projetos</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600 hidden md:inline">Olá, {user.email}</span>
-              <Button 
-                variant="outline" 
-                onClick={handleLogout}
-                className="border-gray-300 hover:bg-gray-100 text-gray-700"
-              >
-                Sair
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {selectedProject ? (
-          <>
-            <ProjectHeader
-              title={selectedProject.nome}
-              photoCount={selectedProject.fotos_count || 0}
-              onBack={handleBackToProjects}
-              onCamera={() => setShowCamera(true)}
-              onUpload={handleFileUpload}
-              onDownload={handleDownloadProject}
-              onShare={() => setShowShareModal(true)}
-            />
-            
-            {photos.length > 0 ? (
-              <motion.div 
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                {photos.map(photo => (
-                  <motion.div
-                    key={photo.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <PhotoCard 
-                      photo={photo} 
-                      onDelete={handleDeletePhoto} 
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-            ) : (
-              <motion.div 
-                className="text-center py-12"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="text-5xl mb-4 text-gray-300">📷</div>
-                <h3 className="text-xl font-medium mb-2 text-gray-700">Nenhuma foto ainda</h3>
-                <p className="text-gray-500 mb-6">
-                  Use a câmera para tirar fotos ou adicione da galeria
-                </p>
-              </motion.div>
-            )}
-          </>
-        ) : (
-          <>
-            {/* Dashboard Stats */}
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total de Projetos</CardTitle>
-                  <FolderOpen className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{projects.length}</div>
-                  <p className="text-xs text-muted-foreground">projetos criados</p>
-                </CardContent>
-              </Card>
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar 
+        userEmail={user.email} 
+        onLogout={handleLogout}
+        onCreateProject={() => setShowNewProjectModal(true)}
+      />
+      
+      <div className="flex-1 overflow-auto">
+        <main className="p-8">
+          {selectedProject ? (
+            <>
+              <ProjectHeader
+                title={selectedProject.nome}
+                photoCount={selectedProject.fotos_count || 0}
+                onBack={handleBackToProjects}
+                onCamera={() => setShowCamera(true)}
+                onUpload={handleFileUpload}
+                onDownload={handleDownloadProject}
+                onShare={() => setShowShareModal(true)}
+              />
               
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total de Fotos</CardTitle>
-                  <CameraIcon className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{totalPhotos}</div>
-                  <p className="text-xs text-muted-foreground">fotos armazenadas</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Projetos Compartilhados</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{sharedProjects}</div>
-                  <p className="text-xs text-muted-foreground">projetos compartilhados</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Projetos Recentes</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{recentProjects.length}</div>
-                  <p className="text-xs text-muted-foreground">criados recentemente</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-            
-            {/* Quick Actions */}
-            <motion.div 
-              className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-800">Meus Projetos</h2>
-                <p className="text-gray-500">Organize e compartilhe suas fotos por projetos</p>
-              </div>
-              <Button 
-                onClick={() => setShowNewProjectModal(true)}
-                className="bg-gray-800 hover:bg-gray-700 text-white"
-              >
-                Novo Projeto
-              </Button>
-            </motion.div>
-            
-            {/* All Projects */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {projects.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {projects.map(project => (
-                    <ProjectCard 
-                      key={project.id}
-                      project={project} 
-                      onClick={() => handleProjectSelect(project)} 
-                      onShare={(proj) => {
-                        setSelectedProject(proj);
-                        setShowShareModal(true);
-                      }}
-                      onDelete={handleDeleteProject}
-                    />
+              {photos.length > 0 ? (
+                <motion.div 
+                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {photos.map(photo => (
+                    <motion.div
+                      key={photo.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <PhotoCard 
+                        photo={photo} 
+                        onDelete={handleDeletePhoto} 
+                      />
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               ) : (
-                <div className="text-center py-12">
-                  <div className="text-5xl mb-4 text-gray-300">📁</div>
-                  <h3 className="text-xl font-medium mb-2 text-gray-700">Nenhum projeto encontrado</h3>
+                <motion.div 
+                  className="text-center py-12"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="text-5xl mb-4 text-gray-300">📷</div>
+                  <h3 className="text-xl font-medium mb-2 text-gray-700">Nenhuma foto ainda</h3>
                   <p className="text-gray-500 mb-6">
-                    Crie seu primeiro projeto para começar a organizar suas fotos
+                    Use a câmera para tirar fotos ou adicione da galeria
                   </p>
-                  <Button 
-                    onClick={() => setShowNewProjectModal(true)}
-                    className="bg-gray-800 hover:bg-gray-700 text-white"
-                  >
-                    Criar Projeto
-                  </Button>
-                </div>
+                </motion.div>
               )}
-            </motion.div>
-          </>
-        )}
-      </main>
+            </>
+          ) : (
+            <>
+              {/* Dashboard Stats */}
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total de Projetos</CardTitle>
+                    <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{projects.length}</div>
+                    <p className="text-xs text-muted-foreground">projetos criados</p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total de Fotos</CardTitle>
+                    <CameraIcon className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{totalPhotos}</div>
+                    <p className="text-xs text-muted-foreground">fotos armazenadas</p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Projetos Compartilhados</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{sharedProjects}</div>
+                    <p className="text-xs text-muted-foreground">projetos compartilhados</p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Projetos Recentes</CardTitle>
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{recentProjects.length}</div>
+                    <p className="text-xs text-muted-foreground">criados recentemente</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+              
+              {/* Quick Actions */}
+              <motion.div 
+                className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <div>
+                  <h2 className="text-2xl font-semibold text-gray-800">Meus Projetos</h2>
+                  <p className="text-gray-500">Organize e compartilhe suas fotos por projetos</p>
+                </div>
+                <Button 
+                  onClick={() => setShowNewProjectModal(true)}
+                  className="bg-gray-800 hover:bg-gray-700 text-white"
+                >
+                  Novo Projeto
+                </Button>
+              </motion.div>
+              
+              {/* All Projects */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                {projects.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {projects.map(project => (
+                      <ProjectCard 
+                        key={project.id}
+                        project={project} 
+                        onClick={() => handleProjectSelect(project)} 
+                        onShare={(proj) => {
+                          setSelectedProject(proj);
+                          setShowShareModal(true);
+                        }}
+                        onDelete={handleDeleteProject}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="text-5xl mb-4 text-gray-300">📁</div>
+                    <h3 className="text-xl font-medium mb-2 text-gray-700">Nenhum projeto encontrado</h3>
+                    <p className="text-gray-500 mb-6">
+                      Crie seu primeiro projeto para começar a organizar suas fotos
+                    </p>
+                    <Button 
+                      onClick={() => setShowNewProjectModal(true)}
+                      className="bg-gray-800 hover:bg-gray-700 text-white"
+                    >
+                      Criar Projeto
+                    </Button>
+                  </div>
+                )}
+              </motion.div>
+            </>
+          )}
+        </main>
+      </div>
 
       {/* Camera View */}
       {showCamera && selectedProject && (
