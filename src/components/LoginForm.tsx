@@ -20,19 +20,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loading }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Camera className="h-16 w-16 text-primary" />
+            <div className="bg-gray-800 p-3 rounded-full">
+              <Camera className="h-12 w-12 text-white" />
+            </div>
           </div>
-          <CardTitle className="text-2xl">Meus Projetos</CardTitle>
-          <CardDescription>Organize e compartilhe suas fotos</CardDescription>
+          <CardTitle className="text-2xl font-semibold text-gray-800">Meus Projetos</CardTitle>
+          <CardDescription className="text-gray-600">Organize e compartilhe suas fotos</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-700">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -40,10 +42,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loading }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="border-gray-300 focus:ring-gray-500 focus:border-gray-500"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password" className="text-gray-700">Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -51,11 +54,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loading }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="border-gray-300 focus:ring-gray-500 focus:border-gray-500"
               />
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" type="submit" disabled={loading}>
+            <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white" type="submit" disabled={loading}>
               {loading ? "Entrando..." : "Entrar"}
             </Button>
           </CardFooter>

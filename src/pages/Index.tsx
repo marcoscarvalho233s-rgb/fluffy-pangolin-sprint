@@ -412,14 +412,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+      <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-2 rounded-lg">
+              <div className="bg-gray-800 p-2 rounded-lg">
                 <span className="text-xl text-white">📷</span>
               </div>
-              <h1 className="text-xl font-bold text-gray-900">Meus Projetos</h1>
+              <h1 className="text-xl font-semibold text-gray-800">Meus Projetos</h1>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600 hidden md:inline">Olá, {user.email}</span>
@@ -477,7 +477,7 @@ const Index = () => {
                 transition={{ duration: 0.5 }}
               >
                 <div className="text-5xl mb-4 text-gray-300">📷</div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-700">Nenhuma foto ainda</h3>
+                <h3 className="text-xl font-medium mb-2 text-gray-700">Nenhuma foto ainda</h3>
                 <p className="text-gray-500 mb-6">
                   Use a câmera para tirar fotos ou adicione da galeria
                 </p>
@@ -493,14 +493,14 @@ const Index = () => {
               transition={{ duration: 0.5 }}
             >
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Meus Projetos</h2>
+                <h2 className="text-2xl font-semibold text-gray-800">Meus Projetos</h2>
                 <p className="text-gray-500">Organize e compartilhe suas fotos por projetos</p>
               </div>
               <Button 
                 onClick={() => setShowNewProjectModal(true)}
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white"
+                className="bg-gray-800 hover:bg-gray-700 text-white"
               >
-                ➕ Novo Projeto
+                Novo Projeto
               </Button>
             </motion.div>
             
@@ -538,13 +538,13 @@ const Index = () => {
                 transition={{ duration: 0.5 }}
               >
                 <div className="text-5xl mb-4 text-gray-300">📁</div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-700">Nenhum projeto encontrado</h3>
+                <h3 className="text-xl font-medium mb-2 text-gray-700">Nenhum projeto encontrado</h3>
                 <p className="text-gray-500 mb-6">
                   Crie seu primeiro projeto para começar a organizar suas fotos
                 </p>
                 <Button 
                   onClick={() => setShowNewProjectModal(true)}
-                  className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white"
+                  className="bg-gray-800 hover:bg-gray-700 text-white"
                 >
                   Criar Projeto
                 </Button>

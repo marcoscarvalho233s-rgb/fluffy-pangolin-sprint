@@ -24,23 +24,23 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={onBack}>
+        <Button variant="ghost" size="icon" onClick={onBack} className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h2 className="text-2xl font-bold">{title}</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
           <p className="text-gray-500">{photoCount} fotos</p>
         </div>
       </div>
       
       <div className="flex flex-wrap gap-2">
-        <Button onClick={onCamera} className="bg-green-600 hover:bg-green-700">
+        <Button onClick={onCamera} className="bg-gray-800 hover:bg-gray-700 text-white">
           <Camera className="h-4 w-4 mr-2" />
           Tirar Foto
         </Button>
         
         <label className="cursor-pointer">
-          <Button className="bg-blue-600 hover:bg-blue-700">
+          <Button className="bg-gray-600 hover:bg-gray-500 text-white">
             <Download className="h-4 w-4 mr-2" />
             Galeria
           </Button>
@@ -55,14 +55,14 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
         
         <Button 
           onClick={onDownload} 
-          className="bg-purple-600 hover:bg-purple-700"
+          className="bg-gray-500 hover:bg-gray-400 text-white"
           disabled={photoCount === 0}
         >
           <Download className="h-4 w-4 mr-2" />
           Baixar ZIP
         </Button>
         
-        <Button onClick={onShare} className="bg-yellow-600 hover:bg-yellow-700">
+        <Button onClick={onShare} className="bg-gray-400 hover:bg-gray-300 text-gray-800">
           <Share2 className="h-4 w-4 mr-2" />
           Compartilhar
         </Button>

@@ -20,22 +20,22 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, onSh
 
   return (
     <Card 
-      className="cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 bg-white"
+      className="cursor-pointer hover:shadow-md transition-all duration-300 border border-gray-200 bg-white rounded-lg"
       onClick={onClick}
     >
       <div className="relative">
-        <div className="h-40 bg-gradient-to-r from-gray-100 to-gray-200 flex items-center justify-center rounded-t-lg">
+        <div className="h-40 bg-gray-100 flex items-center justify-center rounded-t-lg">
           <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
         </div>
         {project.compartilhado && (
-          <div className="absolute top-3 right-3 bg-white rounded-full p-1 shadow-md">
-            <Users className="h-5 w-5 text-blue-500" />
+          <div className="absolute top-3 right-3 bg-white rounded-full p-1 shadow-sm">
+            <Users className="h-5 w-5 text-gray-600" />
           </div>
         )}
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger 
             onClick={(e) => e.stopPropagation()}
-            className="absolute top-3 left-3 bg-white/80 backdrop-blur-sm rounded-full p-1 shadow-md hover:bg-white transition-colors"
+            className="absolute top-3 left-3 bg-white/80 backdrop-blur-sm rounded-full p-1 shadow-sm hover:bg-white transition-colors"
           >
             <MoreVertical className="h-5 w-5 text-gray-600" />
           </DropdownMenuTrigger>
@@ -69,7 +69,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, onSh
           <span>{new Date(project.data_criacao).toLocaleDateString('pt-BR')}</span>
         </div>
         {project.proprietario !== 'demo@exemplo.com' && (
-          <div className="text-xs text-purple-500 italic mt-2">
+          <div className="text-xs text-gray-500 italic mt-2">
             Compartilhado por: {project.proprietario}
           </div>
         )}
