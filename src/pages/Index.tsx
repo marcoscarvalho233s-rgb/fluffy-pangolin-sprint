@@ -461,6 +461,8 @@ const Index = () => {
         userEmail={user.email} 
         onLogout={handleLogout}
         onCreateProject={() => setShowNewProjectModal(true)}
+        projects={projects}
+        onProjectSelect={handleProjectSelect}
       />
       
       <div className="flex-1 overflow-auto">

@@ -7,7 +7,8 @@ import {
   Users, 
   Settings, 
   LogOut,
-  PlusCircle
+  PlusCircle,
+  Image
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -15,9 +16,17 @@ interface SidebarProps {
   userEmail: string;
   onLogout: () => void;
   onCreateProject: () => void;
+  projects: any[];
+  onProjectSelect: (project: any) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ userEmail, onLogout, onCreateProject }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ 
+  userEmail, 
+  onLogout, 
+  onCreateProject,
+  projects,
+  onProjectSelect
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -35,6 +44,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ userEmail, onLogout, onCreateP
     }
     return location.pathname.startsWith(path);
   };
+
+  // Get the 3 most recent projects
+  const recentProjects = [...projects]
+    .sort((a, b) => new Date(b.data_criacao).getTime() - new Date(a.data_criacao).getTime())
+    .slice(0, 3);
 
   return (
     <div className="flex flex-col h-full bg-white border-r border-gray-200 w-64">
@@ -64,6 +78,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ userEmail, onLogout, onCreateP
             );
           })}
         </nav>
+
+        {/* Quick Access Projects */}
+        {recentProjects.length > 0 && (
+          <div className="px-4 mt-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-500">Acesso Rápido</h3>
+            </div>
+            <div className="space-y-1">
+              {recentProjects.map((project) => (
+                <Button
+                  key={project.id}
+                  variant="ghost"
+                  className="w-full justify-start gap-3 py-2 h-auto truncate"
+                  onClick={() => onProjectSelect(project)}
+                >
+                  <Image className="h-5 w-5 text-gray-500 flex-shrink-0" />
+                  <span className="truncate text-left">{project.nome}</span>
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="p-4 border-t border-gray-200">
