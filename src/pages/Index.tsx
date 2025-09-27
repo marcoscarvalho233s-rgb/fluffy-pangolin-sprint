@@ -600,62 +600,12 @@ const Index = () => {
               </Button>
             </motion.div>
             
-            {/* Recent Projects */}
-            <motion.div 
-              className="mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-800">Projetos Recentes</h3>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => {}}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  Ver todos
-                </Button>
-              </div>
-              
-              {recentProjects.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {recentProjects.map(project => (
-                    <ProjectCard 
-                      key={project.id}
-                      project={project} 
-                      onClick={() => handleProjectSelect(project)} 
-                      onShare={(proj) => {
-                        setSelectedProject(proj);
-                        setShowShareModal(true);
-                      }}
-                      onDelete={handleDeleteProject}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-                  <FolderOpen className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h4 className="text-lg font-medium text-gray-700 mb-2">Nenhum projeto recente</h4>
-                  <p className="text-gray-500 mb-4">Crie seu primeiro projeto para começar</p>
-                  <Button 
-                    onClick={() => setShowNewProjectModal(true)}
-                    className="bg-gray-800 hover:bg-gray-700 text-white"
-                  >
-                    Criar Projeto
-                  </Button>
-                </div>
-              )}
-            </motion.div>
-            
             {/* All Projects */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <h3 className="text-lg font-medium text-gray-800 mb-4">Todos os Projetos</h3>
-              
               {projects.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {projects.map(project => (
